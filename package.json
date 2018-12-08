@@ -1,0 +1,17 @@
+{
+  "name": "weatheroffice-forecast",
+  "version": "1.0.0",
+  "description": "Get canadian weather in a json format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ryan Ramage",
+  "license": "ISC",
+  "dependencies": {
+    "fecha": "^3.0.0",
+    "lodash.get": "^4.4.2",
+    "request": "^2.88.0",
+    "xml2js": "^0.4.19"
+  }
+}
