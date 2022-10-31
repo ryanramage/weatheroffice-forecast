@@ -1,6 +1,8 @@
 const request = require('request')
 const xml2js = require ('xml2js')
 const get = require('lodash.get')
+const { parse } = require('date-fns')
+const { utcToZonedTime, zonedTimeToUtc, format } = require('date-fns-tz')
 
 module.exports = function (src, done) {
   request.get(src, function (err, resp, body) {
@@ -33,26 +35,27 @@ function getHourly (data) {
   return hourly.map(function (item) {
     let timeInfo = get(item, '$.dateTimeUTC')
     let date = toDate(timeInfo)
-    let humane = date.toLocaleString()
+    const timeZone = 'America/Edmonton'
+    const zonedDate = utcToZonedTime(date, timeZone)
+    const pattern = 'hh:mm aaa'
+    const humane = format(zonedDate, pattern, { timeZone: 'America/Edmonton' })
+
     // timeInfo is a string like '201811291530' or 'YYYYMMDDHHMM'
     let [condition] = item.condition
     let temperature = Number(get(item, 'temperature[0]._'))
     let windChill = Number(get(item, 'windChill[0]._'))
     let windSpeed = Number(get(item, 'wind[0].speed[0]._'))
     let windDir = get(item, 'wind[0].direction[0]._')
+    let windGust = Number(get(item, 'wind[0].gust[0]._', null))
+    let precipitationChance = get(item, 'lop[0].$.category', 'none')
+    let precipitationPercent = Number(get(item, 'lop[0]._'))
 
-    return {condition, temperature, windChill, windSpeed, windDir, timeInfo, date, humane}
+    return {date, humane, condition, temperature, windChill, windSpeed, windDir, windGust, precipitationChance, precipitationPercent}
   })
 }
 
 function toDate (eStr) {
-  let d = new Date()
-  let year = Number(eStr.substring(0, 4))
-  let month = Number(eStr.substring(4,6))
-  let day = Number(eStr.substring(6,8))
-  let hour = Number(eStr.substring(8,10))
-  let min = Number(eStr.substring(10,12))
-  d.setFullYear(year, month, day)
-  d.setHours(hour, min, 0)
+  const str = eStr + '-0000' // comes in as utc time in a weird format
+  let d = parse(str, 'yyyyMMddHHmmXXXX', new Date())
   return d
 }

@@ -11,7 +11,7 @@ Usage:
 Then
 
     const forecast = require('weatheroffice-forecast')
-    forecast.get('http://dd.weatheroffice.gc.ca/citypage_weather/xml/AB/s0000045_e.xml', (err, data) => console.log(err, data))
+    forecast.get('http://dd.weather.gc.ca/citypage_weather/xml/AB/s0000045_e.xml', (err, data) => console.log(err, data))
 
 Data will look like
 
